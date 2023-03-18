@@ -11,7 +11,16 @@ import (
 
 type RSSSource struct {
 	URL        string
+	SourceID   int64
 	SourceName string
+}
+
+func NewRSSSourceFromModel(m model.Source) RSSSource {
+	return RSSSource{
+		URL:        m.FeedURL,
+		SourceID:   m.ID,
+		SourceName: m.Name,
+	}
 }
 
 func (s RSSSource) Fetch(ctx context.Context) ([]model.Item, error) {
@@ -28,6 +37,10 @@ func (s RSSSource) Fetch(ctx context.Context) ([]model.Item, error) {
 			SourceName: s.SourceName,
 		}
 	}), nil
+}
+
+func (s RSSSource) ID() int64 {
+	return s.SourceID
 }
 
 func (s RSSSource) Name() string {
