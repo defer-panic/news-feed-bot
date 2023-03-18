@@ -3,7 +3,6 @@ package fetcher
 import (
 	"context"
 	"log"
-	"math/rand"
 	"sync"
 	"time"
 
@@ -12,7 +11,7 @@ import (
 )
 
 type ArticleStorage interface {
-	StoreArticle(ctx context.Context, article model.Article) error
+	Store(ctx context.Context, article model.Article) error
 }
 
 type SourcesProvider interface {
@@ -20,8 +19,10 @@ type SourcesProvider interface {
 }
 
 type Fetcher struct {
-	rand   *rand.Rand
-	config Config
+	articles ArticleStorage
+	sources  SourcesProvider
+
+	fetchInterval time.Duration
 }
 
 type Source interface {
@@ -36,12 +37,16 @@ type Config struct {
 	SourcesProvider SourcesProvider
 }
 
-func New(config Config) *Fetcher {
-	return &Fetcher{config: config}
+func New(articleStorage ArticleStorage, sourcesProvider SourcesProvider, fetchInterval time.Duration) *Fetcher {
+	return &Fetcher{
+		articles:      articleStorage,
+		sources:       sourcesProvider,
+		fetchInterval: fetchInterval,
+	}
 }
 
 func (f *Fetcher) Start(ctx context.Context) error {
-	ticker := time.NewTicker(f.config.FetchInterval)
+	ticker := time.NewTicker(f.fetchInterval)
 	defer ticker.Stop()
 
 	if err := f.Fetch(ctx); err != nil {
@@ -61,7 +66,7 @@ func (f *Fetcher) Start(ctx context.Context) error {
 }
 
 func (f *Fetcher) Fetch(ctx context.Context) error {
-	sources, err := f.config.SourcesProvider.Sources(ctx)
+	sources, err := f.sources.Sources(ctx)
 	if err != nil {
 		return err
 	}
@@ -96,7 +101,7 @@ func (f *Fetcher) processItems(ctx context.Context, source Source, items []model
 	for _, item := range items {
 		item.Date = item.Date.UTC()
 
-		if err := f.config.ArticleStorage.StoreArticle(ctx, model.Article{
+		if err := f.articles.Store(ctx, model.Article{
 			SourceID:    source.ID(),
 			Title:       item.Title,
 			Link:        item.Link,

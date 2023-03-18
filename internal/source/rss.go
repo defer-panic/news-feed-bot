@@ -48,7 +48,6 @@ func (s RSSSource) Name() string {
 }
 
 func (s RSSSource) loadFeed(ctx context.Context, url string) (*rss.Feed, error) {
-	// load rss feed with context:
 	var (
 		feedCh = make(chan *rss.Feed)
 		errCh  = make(chan error)

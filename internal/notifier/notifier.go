@@ -1,4 +1,4 @@
-package provider
+package notifier
 
 import (
 	"context"
@@ -12,43 +12,46 @@ import (
 )
 
 type ArticleProvider interface {
-	NotPostedArticles(ctx context.Context, since time.Time, limit uint64) ([]model.Article, error)
-	MarkArticleAsPosted(ctx context.Context, article model.Article) error
+	AllNotPosted(ctx context.Context, since time.Time, limit uint64) ([]model.Article, error)
+	MarkAsPosted(ctx context.Context, article model.Article) error
 }
 
-type Provider struct {
-	articles     ArticleProvider
-	bot          *tgbotapi.BotAPI
-	sendInterval time.Duration
-	chatID       int64
+type Notifier struct {
+	articles         ArticleProvider
+	bot              *tgbotapi.BotAPI
+	sendInterval     time.Duration
+	lookupTimeWindow time.Duration
+	chatID           int64
 }
 
 func New(
 	articleProvider ArticleProvider,
 	bot *tgbotapi.BotAPI,
 	sendInterval time.Duration,
+	lookupTimeWindow time.Duration,
 	chatID int64,
-) *Provider {
-	return &Provider{
-		articles:     articleProvider,
-		bot:          bot,
-		sendInterval: sendInterval,
-		chatID:       chatID,
+) *Notifier {
+	return &Notifier{
+		articles:         articleProvider,
+		bot:              bot,
+		sendInterval:     sendInterval,
+		lookupTimeWindow: lookupTimeWindow,
+		chatID:           chatID,
 	}
 }
 
-func (p *Provider) Start(ctx context.Context) error {
-	ticker := time.NewTicker(p.sendInterval)
+func (n *Notifier) Start(ctx context.Context) error {
+	ticker := time.NewTicker(n.sendInterval)
 	defer ticker.Stop()
 
-	if err := p.SelectAndSendArticle(ctx); err != nil {
+	if err := n.SelectAndSendArticle(ctx); err != nil {
 		return err
 	}
 
 	for {
 		select {
 		case <-ticker.C:
-			if err := p.SelectAndSendArticle(ctx); err != nil {
+			if err := n.SelectAndSendArticle(ctx); err != nil {
 				return err
 			}
 		case <-ctx.Done():
@@ -57,8 +60,8 @@ func (p *Provider) Start(ctx context.Context) error {
 	}
 }
 
-func (p *Provider) SelectAndSendArticle(ctx context.Context) error {
-	topOneArticles, err := p.articles.NotPostedArticles(ctx, time.Now().Add(-20*time.Minute), 1)
+func (n *Notifier) SelectAndSendArticle(ctx context.Context) error {
+	topOneArticles, err := n.articles.AllNotPosted(ctx, time.Now().Add(-n.lookupTimeWindow), 1)
 	if err != nil {
 		return err
 	}
@@ -69,22 +72,22 @@ func (p *Provider) SelectAndSendArticle(ctx context.Context) error {
 
 	article := topOneArticles[0]
 
-	if err := p.sendArticle(ctx, article); err != nil {
+	if err := n.sendArticle(ctx, article); err != nil {
 		return err
 	}
 
-	if err := p.articles.MarkArticleAsPosted(ctx, article); err != nil {
+	if err := n.articles.MarkAsPosted(ctx, article); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (p *Provider) sendArticle(ctx context.Context, article model.Article) error {
+func (n *Notifier) sendArticle(ctx context.Context, article model.Article) error {
 	const msgFormat = `[%s](%s)`
 
 	msg := tgbotapi.NewMessage(
-		p.chatID,
+		n.chatID,
 		fmt.Sprintf(
 			msgFormat,
 			escapeForMarkdown(article.Title),
@@ -93,12 +96,12 @@ func (p *Provider) sendArticle(ctx context.Context, article model.Article) error
 	)
 	msg.ParseMode = "MarkdownV2"
 
-	_, err := p.bot.Send(msg)
+	_, err := n.bot.Send(msg)
 	if err != nil {
 		return err
 	}
 
-	if err := p.articles.MarkArticleAsPosted(ctx, article); err != nil {
+	if err := n.articles.MarkAsPosted(ctx, article); err != nil {
 		return err
 	}
 

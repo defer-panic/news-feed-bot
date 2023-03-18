@@ -19,7 +19,7 @@ func NewArticleStorage(db *sqlx.DB) *ArticlePostgresStorage {
 	return &ArticlePostgresStorage{db: db}
 }
 
-func (s *ArticlePostgresStorage) StoreArticle(ctx context.Context, article model.Article) error {
+func (s *ArticlePostgresStorage) Store(ctx context.Context, article model.Article) error {
 	conn, err := s.db.Connx(ctx)
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func (s *ArticlePostgresStorage) StoreArticle(ctx context.Context, article model
 	return nil
 }
 
-func (s *ArticlePostgresStorage) NotPostedArticles(ctx context.Context, since time.Time, limit uint64) ([]model.Article, error) {
+func (s *ArticlePostgresStorage) AllNotPosted(ctx context.Context, since time.Time, limit uint64) ([]model.Article, error) {
 	conn, err := s.db.Connx(ctx)
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (s *ArticlePostgresStorage) NotPostedArticles(ctx context.Context, since ti
 	}), nil
 }
 
-func (s *ArticlePostgresStorage) MarkArticleAsPosted(ctx context.Context, article model.Article) error {
+func (s *ArticlePostgresStorage) MarkAsPosted(ctx context.Context, article model.Article) error {
 	conn, err := s.db.Connx(ctx)
 	if err != nil {
 		return err
