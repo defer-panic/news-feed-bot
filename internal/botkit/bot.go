@@ -1,4 +1,4 @@
-package bot
+package botkit
 
 import (
 	"context"
@@ -106,4 +106,4 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 	}
 }
 
-type ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, msg tgbotapi.Update) error
+type ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error

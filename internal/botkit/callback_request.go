@@ -1,4 +1,4 @@
-package bot
+package botkit
 
 import "encoding/json"
 

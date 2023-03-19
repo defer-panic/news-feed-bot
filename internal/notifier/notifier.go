@@ -3,11 +3,11 @@ package notifier
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
+	"github.com/defer-panic/news-feed-bot/internal/botkit/markup"
 	"github.com/defer-panic/news-feed-bot/internal/model"
 )
 
@@ -90,8 +90,8 @@ func (n *Notifier) sendArticle(ctx context.Context, article model.Article) error
 		n.chatID,
 		fmt.Sprintf(
 			msgFormat,
-			escapeForMarkdown(article.Title),
-			escapeForMarkdown(article.Link),
+			markup.EscapeForMarkdown(article.Title),
+			markup.EscapeForMarkdown(article.Link),
 		),
 	)
 	msg.ParseMode = "MarkdownV2"
@@ -106,47 +106,4 @@ func (n *Notifier) sendArticle(ctx context.Context, article model.Article) error
 	}
 
 	return nil
-}
-
-func escapeForMarkdown(link string) string {
-	replacer := strings.NewReplacer(
-		"-",
-		"\\-",
-		"_",
-		"\\_",
-		"*",
-		"\\*",
-		"[",
-		"\\[",
-		"]",
-		"\\]",
-		"(",
-		"\\(",
-		")",
-		"\\)",
-		"~",
-		"\\~",
-		"`",
-		"\\`",
-		">",
-		"\\>",
-		"#",
-		"\\#",
-		"+",
-		"\\+",
-		"=",
-		"\\=",
-		"|",
-		"\\|",
-		"{",
-		"\\{",
-		"}",
-		"\\}",
-		".",
-		"\\.",
-		"!",
-		"\\!",
-	)
-
-	return replacer.Replace(link)
 }

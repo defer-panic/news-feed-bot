@@ -12,6 +12,8 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/defer-panic/news-feed-bot/internal/bot"
+	"github.com/defer-panic/news-feed-bot/internal/bot/middleware"
+	"github.com/defer-panic/news-feed-bot/internal/botkit"
 	"github.com/defer-panic/news-feed-bot/internal/config"
 	"github.com/defer-panic/news-feed-bot/internal/fetcher"
 	"github.com/defer-panic/news-feed-bot/internal/notifier"
@@ -47,7 +49,42 @@ func main() {
 		)
 	)
 
-	newsBot := bot.New(botAPI)
+	newsBot := botkit.New(botAPI)
+	newsBot.RegisterCmdView(
+		"addsource",
+		middleware.AdminsOnly(
+			config.Get().TelegramChannelID,
+			bot.ViewCmdAddSource(sourceStorage),
+		),
+	)
+	newsBot.RegisterCmdView(
+		"setpriority",
+		middleware.AdminsOnly(
+			config.Get().TelegramChannelID,
+			bot.ViewCmdSetPriority(sourceStorage),
+		),
+	)
+	newsBot.RegisterCmdView(
+		"getsource",
+		middleware.AdminsOnly(
+			config.Get().TelegramChannelID,
+			bot.ViewCmdGetSource(sourceStorage),
+		),
+	)
+	newsBot.RegisterCmdView(
+		"listsources",
+		middleware.AdminsOnly(
+			config.Get().TelegramChannelID,
+			bot.ViewCmdListSource(sourceStorage),
+		),
+	)
+	newsBot.RegisterCmdView(
+		"deletesource",
+		middleware.AdminsOnly(
+			config.Get().TelegramChannelID,
+			bot.ViewCmdDeleteSource(sourceStorage),
+		),
+	)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
@@ -65,6 +102,6 @@ func main() {
 	}(ctx)
 
 	if err := newsBot.Run(ctx); err != nil {
-		log.Printf("[ERROR] failed to run bot: %v", err)
+		log.Printf("[ERROR] failed to run botkit: %v", err)
 	}
 }
