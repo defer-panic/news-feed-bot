@@ -32,6 +32,7 @@ func (s RSSSource) Fetch(ctx context.Context) ([]model.Item, error) {
 	return lo.Map(feed.Items, func(item *rss.Item, _ int) model.Item {
 		return model.Item{
 			Title:      item.Title,
+			Categories: item.Categories,
 			Link:       item.Link,
 			Date:       item.Date,
 			SourceName: s.SourceName,

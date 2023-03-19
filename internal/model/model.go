@@ -6,6 +6,7 @@ import (
 
 type Item struct {
 	Title       string
+	Categories  []string
 	Description string
 	Link        string
 	Date        time.Time

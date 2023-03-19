@@ -15,6 +15,7 @@ type Config struct {
 	DatabaseDSN          string        `hcl:"database_dsn" default:"postgres://postgres:postgres@localhost:5432/news_feed_bot?sslmode=disable"`
 	FetchInterval        time.Duration `hcl:"fetch_interval" default:"10m"`
 	NotificationInterval time.Duration `hcl:"notification_interval" default:"1m"`
+	FilterKeywords       []string      `hcl:"filter_keywords"`
 }
 
 var (

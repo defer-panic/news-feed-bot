@@ -39,8 +39,13 @@ func main() {
 	var (
 		articleStorage = storage.NewArticleStorage(db)
 		sourceStorage  = storage.NewSourceStorage(db)
-		fetcher        = fetcher.New(articleStorage, sourceStorage, config.Get().FetchInterval)
-		notifier       = notifier.New(
+		fetcher        = fetcher.New(
+			articleStorage,
+			sourceStorage,
+			config.Get().FetchInterval,
+			config.Get().FilterKeywords,
+		)
+		notifier = notifier.New(
 			articleStorage,
 			botAPI,
 			config.Get().NotificationInterval,

@@ -15,5 +15,6 @@ require (
 require (
 	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/tomakado/containers v0.0.0-20230201144544-f093171e88cf // indirect
 	golang.org/x/exp v0.0.0-20230131160201-f062dba9d201 // indirect
 )

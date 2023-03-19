@@ -3,8 +3,11 @@ package fetcher
 import (
 	"context"
 	"log"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/tomakado/containers/set"
 
 	"github.com/defer-panic/news-feed-bot/internal/model"
 	src "github.com/defer-panic/news-feed-bot/internal/source"
@@ -22,7 +25,8 @@ type Fetcher struct {
 	articles ArticleStorage
 	sources  SourcesProvider
 
-	fetchInterval time.Duration
+	fetchInterval  time.Duration
+	filterKeywords []string
 }
 
 type Source interface {
@@ -31,17 +35,17 @@ type Source interface {
 	Fetch(ctx context.Context) ([]model.Item, error)
 }
 
-type Config struct {
-	FetchInterval   time.Duration
-	ArticleStorage  ArticleStorage
-	SourcesProvider SourcesProvider
-}
-
-func New(articleStorage ArticleStorage, sourcesProvider SourcesProvider, fetchInterval time.Duration) *Fetcher {
+func New(
+	articleStorage ArticleStorage,
+	sourcesProvider SourcesProvider,
+	fetchInterval time.Duration,
+	filterKeywords []string,
+) *Fetcher {
 	return &Fetcher{
-		articles:      articleStorage,
-		sources:       sourcesProvider,
-		fetchInterval: fetchInterval,
+		articles:       articleStorage,
+		sources:        sourcesProvider,
+		fetchInterval:  fetchInterval,
+		filterKeywords: filterKeywords,
 	}
 }
 
@@ -101,6 +105,11 @@ func (f *Fetcher) processItems(ctx context.Context, source Source, items []model
 	for _, item := range items {
 		item.Date = item.Date.UTC()
 
+		if f.itemShouldBeSkipped(item) {
+			log.Printf("[INFO] item %q (%s) from source %q should be skipped", item.Title, item.Link, source.Name())
+			continue
+		}
+
 		if err := f.articles.Store(ctx, model.Article{
 			SourceID:    source.ID(),
 			Title:       item.Title,
@@ -112,4 +121,16 @@ func (f *Fetcher) processItems(ctx context.Context, source Source, items []model
 	}
 
 	return nil
+}
+
+func (f *Fetcher) itemShouldBeSkipped(item model.Item) bool {
+	categoriesSet := set.New(item.Categories...)
+
+	for _, keyword := range f.filterKeywords {
+		if categoriesSet.Contains(keyword) || strings.Contains(item.Title, keyword) {
+			return true
+		}
+	}
+
+	return false
 }
