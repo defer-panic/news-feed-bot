@@ -72,18 +72,14 @@ func (n *Notifier) SelectAndSendArticle(ctx context.Context) error {
 
 	article := topOneArticles[0]
 
-	if err := n.sendArticle(ctx, article); err != nil {
+	if err := n.sendArticle(article); err != nil {
 		return err
 	}
 
-	if err := n.articles.MarkAsPosted(ctx, article); err != nil {
-		return err
-	}
-
-	return nil
+	return n.articles.MarkAsPosted(ctx, article)
 }
 
-func (n *Notifier) sendArticle(ctx context.Context, article model.Article) error {
+func (n *Notifier) sendArticle(article model.Article) error {
 	const msgFormat = `[%s](%s)`
 
 	msg := tgbotapi.NewMessage(
@@ -98,10 +94,6 @@ func (n *Notifier) sendArticle(ctx context.Context, article model.Article) error
 
 	_, err := n.bot.Send(msg)
 	if err != nil {
-		return err
-	}
-
-	if err := n.articles.MarkAsPosted(ctx, article); err != nil {
 		return err
 	}
 

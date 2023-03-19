@@ -38,7 +38,7 @@ func ViewCmdListSource(lister SourceLister) botkit.ViewFunc {
 		)
 
 		reply := tgbotapi.NewMessage(update.Message.Chat.ID, msgText)
-		reply.ParseMode = "MarkdownV2"
+		reply.ParseMode = parseModeMarkdownV2
 
 		if _, err := bot.Send(reply); err != nil {
 			return err

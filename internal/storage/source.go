@@ -83,6 +83,7 @@ func (s *SourcePostgresStorage) SetPriority(ctx context.Context, id int64, prior
 	defer conn.Close()
 
 	_, err = conn.ExecContext(ctx, `UPDATE sources SET priority = $1 WHERE id = $2`, priority, id)
+
 	return err
 }
 

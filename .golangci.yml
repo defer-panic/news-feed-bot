@@ -1,0 +1,52 @@
+run:
+  timeout: 3m
+  gofmt:
+    simplify: true
+  revive:
+    rules:
+      - name: line-length-limit
+        arguments: 120
+  skip-dirs:
+    - ".*mocks.*"
+    - vendor
+    - ".*gen.*"
+  gofumports:
+    local-prefixes: "github.com/defer-panic/news-feed-bot"
+
+output:
+  sort-results: true
+
+issues:
+  exclude-use-default: true
+  fix: false
+  exclude-rules:
+    - linters:
+        - revive
+      text: 'should not use basic type string as key in context.WithValue'
+
+    - linters:
+        - revive
+      text: "don't use an underscore in package name"
+
+    - linters:
+        - staticcheck
+      text: 'SA1029:' # the same as revive's rule about string as a key in context.WithValue
+
+    - linters:
+        - revive
+      text: "comment on exported var"
+
+linters:
+  enable:
+    - revive
+    - gofmt
+    - gosimple
+    - misspell
+    - goimports
+    - godot
+    - cyclop
+    - gocognit
+    - gocritic
+    - prealloc
+    - wsl
+    - goconst

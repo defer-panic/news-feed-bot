@@ -57,21 +57,18 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 
 	var view ViewFunc
 
-	switch {
-	case update.Message != nil:
-		if !update.Message.IsCommand() {
-			break
-		}
-
-		cmd := update.Message.Command()
-		cmdView, ok := b.cmdViews[cmd]
-		if !ok {
-			return
-		}
-		view = cmdView
-	default:
+	if !update.Message.IsCommand() {
 		return
 	}
+
+	cmd := update.Message.Command()
+
+	cmdView, ok := b.cmdViews[cmd]
+	if !ok {
+		return
+	}
+
+	view = cmdView
 
 	if err := view(ctx, b.api, update); err != nil {
 		log.Printf("[ERROR] failed to execute view: %v", err)
