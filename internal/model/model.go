@@ -5,12 +5,11 @@ import (
 )
 
 type Item struct {
-	Title       string
-	Categories  []string
-	Description string
-	Link        string
-	Date        time.Time
-	SourceName  string
+	Title      string
+	Categories []string
+	Link       string
+	Date       time.Time
+	SourceName string
 }
 
 type Source struct {

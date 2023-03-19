@@ -2,7 +2,6 @@ package botkit
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"runtime/debug"
 	"time"
@@ -11,9 +10,8 @@ import (
 )
 
 type Bot struct {
-	api           *tgbotapi.BotAPI
-	cmdViews      map[string]ViewFunc
-	callbackViews map[string]ViewFunc
+	api      *tgbotapi.BotAPI
+	cmdViews map[string]ViewFunc
 }
 
 func New(api *tgbotapi.BotAPI) *Bot {
@@ -26,14 +24,6 @@ func (b *Bot) RegisterCmdView(cmd string, view ViewFunc) {
 	}
 
 	b.cmdViews[cmd] = view
-}
-
-func (b *Bot) RegisterCallbackView(procedure string, view ViewFunc) {
-	if b.callbackViews == nil {
-		b.callbackViews = make(map[string]ViewFunc)
-	}
-
-	b.callbackViews[procedure] = view
 }
 
 func (b *Bot) Run(ctx context.Context) error {
@@ -79,20 +69,6 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 			return
 		}
 		view = cmdView
-	case update.CallbackQuery != nil:
-		var callbackRequest CallbackRequest
-
-		if err := json.Unmarshal([]byte(update.CallbackQuery.Data), &callbackRequest); err != nil {
-			log.Printf("[ERROR] failed to parse callback request: %v", err)
-			return
-		}
-
-		callbackView, ok := b.callbackViews[callbackRequest.Procedure]
-		if !ok {
-			return
-		}
-
-		view = callbackView
 	default:
 		return
 	}

@@ -6,9 +6,7 @@ Bot for Telegram that gets and posts news to a channel.
 
 - [x] Admin commands
 - [x] Filter by keywords
-- [ ] Tests
-  - [ ] Unit tests
-  - [ ] Integration tests
+- [x] Tests
 - [ ] golangci-lint
 - [ ] Docker
 

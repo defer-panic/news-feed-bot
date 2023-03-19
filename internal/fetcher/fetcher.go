@@ -13,12 +13,21 @@ import (
 	src "github.com/defer-panic/news-feed-bot/internal/source"
 )
 
+//go:generate moq --out=mocks/mock_article_storage.go --pkg=mocks . ArticleStorage
 type ArticleStorage interface {
 	Store(ctx context.Context, article model.Article) error
 }
 
+//go:generate moq --out=mocks/mock_sources_provider.go --pkg=mocks . SourcesProvider
 type SourcesProvider interface {
 	Sources(ctx context.Context) ([]model.Source, error)
+}
+
+//go:generate moq --out=mocks/mock_source.go --pkg=mocks . Source
+type Source interface {
+	ID() int64
+	Name() string
+	Fetch(ctx context.Context) ([]model.Item, error)
 }
 
 type Fetcher struct {
@@ -27,12 +36,6 @@ type Fetcher struct {
 
 	fetchInterval  time.Duration
 	filterKeywords []string
-}
-
-type Source interface {
-	ID() int64
-	Name() string
-	Fetch(ctx context.Context) ([]model.Item, error)
 }
 
 func New(
