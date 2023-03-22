@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -93,18 +95,44 @@ func main() {
 		),
 	)
 
+	mux := http.NewServeMux()
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
 	go func(ctx context.Context) {
 		if err := fetcher.Start(ctx); err != nil {
-			log.Printf("[ERROR] failed to run fetcher: %v", err)
+			if !errors.Is(err, context.Canceled) {
+				log.Printf("[ERROR] failed to run fetcher: %v", err)
+				return
+			}
+
+			log.Printf("[INFO] fetcher stopped")
 		}
 	}(ctx)
 
 	go func(ctx context.Context) {
 		if err := notifier.Start(ctx); err != nil {
-			log.Printf("[ERROR] failed to start notifier: %v", err)
+			if !errors.Is(err, context.Canceled) {
+				log.Printf("[ERROR] failed to run notifier: %v", err)
+				return
+			}
+
+			log.Printf("[INFO] notifier stopped")
+		}
+	}(ctx)
+
+	go func(ctx context.Context) {
+		if err := http.ListenAndServe(":8080", mux); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				log.Printf("[ERROR] failed to run http server: %v", err)
+				return
+			}
+
+			log.Printf("[INFO] http server stopped")
 		}
 	}(ctx)
 
