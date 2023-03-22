@@ -1,0 +1,34 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: news_feed_bot
+      PGDATA: /var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data/
+
+  bot:
+    build:
+      context: .
+    restart: on-failure
+    environment:
+      NFB_DATABASE_DSN: ${NFB_DATABASE_DSN:-postgres://postgres:postgres@db:5432/news_feed_bot?sslmode=disable}
+      NFB_TELEGRAM_BOT_TOKEN: ${NFB_TELEGRAM_BOT_TOKEN}
+      NFB_TELEGRAM_CHANNEL_ID: ${NFB_TELEGRAM_CHANNEL_ID}
+      NFB_FETCH_INTERVAL: ${NFB_FETCH_INTERVAL}
+      NFB_NOTIFICATION_INTERVAL: ${NFB_NOTIFICATION_INTERVAL}
+      NFB_FILTER_KEYWORDS: ${NFB_FILTER_KEYWORDS}
+      NFB_OPENAI_KEY: ${NFB_OPENAI_KEY}
+    depends_on:
+      - db
+
+volumes:
+  db:

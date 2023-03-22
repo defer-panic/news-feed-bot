@@ -2,6 +2,7 @@ package source
 
 import (
 	"context"
+	"strings"
 
 	"github.com/SlyMarbo/rss"
 	"github.com/samber/lo"
@@ -36,6 +37,7 @@ func (s RSSSource) Fetch(ctx context.Context) ([]model.Item, error) {
 			Link:       item.Link,
 			Date:       item.Date,
 			SourceName: s.SourceName,
+			Summary:    strings.TrimSpace(item.Summary),
 		}
 	}), nil
 }

@@ -28,3 +28,4 @@ go.work
 
 /config.local.hcl
 /bin/
+.env

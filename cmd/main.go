@@ -18,6 +18,7 @@ import (
 	"github.com/defer-panic/news-feed-bot/internal/fetcher"
 	"github.com/defer-panic/news-feed-bot/internal/notifier"
 	"github.com/defer-panic/news-feed-bot/internal/storage"
+	"github.com/defer-panic/news-feed-bot/internal/summary"
 )
 
 func main() {
@@ -47,6 +48,7 @@ func main() {
 		)
 		notifier = notifier.New(
 			articleStorage,
+			summary.NewOpenAISummarizer(config.Get().OpenAIKey),
 			botAPI,
 			config.Get().NotificationInterval,
 			2*config.Get().FetchInterval,

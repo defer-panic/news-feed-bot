@@ -117,6 +117,7 @@ func (f *Fetcher) processItems(ctx context.Context, source Source, items []model
 			SourceID:    source.ID(),
 			Title:       item.Title,
 			Link:        item.Link,
+			Summary:     item.Summary,
 			PublishedAt: item.Date,
 		}); err != nil {
 			return err

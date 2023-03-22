@@ -10,12 +10,13 @@ import (
 )
 
 type Config struct {
-	TelegramBotToken     string        `hcl:"telegram_bot_token"`
-	TelegramChannelID    int64         `hcl:"telegram_channel_id"`
-	DatabaseDSN          string        `hcl:"database_dsn" default:"postgres://postgres:postgres@localhost:5432/news_feed_bot?sslmode=disable"`
-	FetchInterval        time.Duration `hcl:"fetch_interval" default:"10m"`
-	NotificationInterval time.Duration `hcl:"notification_interval" default:"1m"`
-	FilterKeywords       []string      `hcl:"filter_keywords"`
+	TelegramBotToken     string        `hcl:"telegram_bot_token" env:"TELEGRAM_BOT_TOKEN" required:"true"`
+	TelegramChannelID    int64         `hcl:"telegram_channel_id" env:"TELEGRAM_CHANNEL_ID" required:"true"`
+	DatabaseDSN          string        `hcl:"database_dsn" env:"DATABASE_DSN" default:"postgres://postgres:postgres@db:5432/news_feed_bot?sslmode=disable"`
+	FetchInterval        time.Duration `hcl:"fetch_interval" env:"FETCH_INTERVAL" default:"10m"`
+	NotificationInterval time.Duration `hcl:"notification_interval" env:"NOTIFICATION_INTERVAL" default:"1m"`
+	FilterKeywords       []string      `hcl:"filter_keywords" env:"FILTER_KEYWORDS"`
+	OpenAIKey            string        `hcl:"openai_key" env:"OPENAI_KEY"`
 }
 
 var (

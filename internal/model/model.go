@@ -9,6 +9,7 @@ type Item struct {
 	Categories []string
 	Link       string
 	Date       time.Time
+	Summary    string
 	SourceName string
 }
 
@@ -25,6 +26,7 @@ type Article struct {
 	SourceID    int64
 	Title       string
 	Link        string
+	Summary     string
 	PublishedAt time.Time
 	PostedAt    time.Time
 	CreatedAt   time.Time
