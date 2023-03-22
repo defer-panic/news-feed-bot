@@ -27,6 +27,8 @@ services:
       NFB_NOTIFICATION_INTERVAL: ${NFB_NOTIFICATION_INTERVAL}
       NFB_FILTER_KEYWORDS: ${NFB_FILTER_KEYWORDS}
       NFB_OPENAI_KEY: ${NFB_OPENAI_KEY}
+    ports:
+      - "8080:8080"
     depends_on:
       - db
 
