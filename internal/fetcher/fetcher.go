@@ -131,7 +131,7 @@ func (f *Fetcher) itemShouldBeSkipped(item model.Item) bool {
 	categoriesSet := set.New(item.Categories...)
 
 	for _, keyword := range f.filterKeywords {
-		if categoriesSet.Contains(keyword) || strings.Contains(item.Title, keyword) {
+		if categoriesSet.Contains(keyword) || strings.Contains(strings.ToLower(item.Title), keyword) {
 			return true
 		}
 	}
