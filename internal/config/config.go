@@ -17,6 +17,7 @@ type Config struct {
 	NotificationInterval time.Duration `hcl:"notification_interval" env:"NOTIFICATION_INTERVAL" default:"1m"`
 	FilterKeywords       []string      `hcl:"filter_keywords" env:"FILTER_KEYWORDS"`
 	OpenAIKey            string        `hcl:"openai_key" env:"OPENAI_KEY"`
+	OpenAIPrompt         string        `hcl:"openai_prompt" env:"OPENAI_PROMPT"`
 }
 
 var (
