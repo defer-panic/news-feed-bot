@@ -19,7 +19,10 @@ type OpenAISummarizer struct {
 }
 
 func NewOpenAISummarizer(apiKey, prompt string) *OpenAISummarizer {
-	s := &OpenAISummarizer{client: openai.NewClient(apiKey)}
+	s := &OpenAISummarizer{
+		client: openai.NewClient(apiKey),
+		prompt: prompt,
+	}
 
 	log.Printf("openai summarizer is enabled: %v", apiKey != "")
 
@@ -37,8 +40,6 @@ func (s *OpenAISummarizer) Summarize(text string) (string, error) {
 	if !s.enabled {
 		return "", fmt.Errorf("openai summarizer is disabled")
 	}
-
-	const prompt = "Сделай саммари на русском языке:\n\n"
 
 	request := openai.ChatCompletionRequest{
 		Model: "gpt-3.5-turbo",
