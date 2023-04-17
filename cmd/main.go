@@ -30,8 +30,6 @@ func main() {
 		return
 	}
 
-	botAPI.Debug = true
-
 	db, err := sqlx.Connect("postgres", config.Get().DatabaseDSN)
 	if err != nil {
 		log.Printf("[ERROR] failed to connect to db: %v", err)
