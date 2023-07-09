@@ -14,14 +14,16 @@ import (
 type OpenAISummarizer struct {
 	client  *openai.Client
 	prompt  string
+	model   string
 	enabled bool
 	mu      sync.Mutex
 }
 
-func NewOpenAISummarizer(apiKey, prompt string) *OpenAISummarizer {
+func NewOpenAISummarizer(apiKey, model, prompt string) *OpenAISummarizer {
 	s := &OpenAISummarizer{
 		client: openai.NewClient(apiKey),
 		prompt: prompt,
+		model:  model,
 	}
 
 	log.Printf("openai summarizer is enabled: %v", apiKey != "")
@@ -42,15 +44,19 @@ func (s *OpenAISummarizer) Summarize(text string) (string, error) {
 	}
 
 	request := openai.ChatCompletionRequest{
-		Model: "gpt-3.5-turbo",
+		Model: s.model,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
-				Content: fmt.Sprintf("%s%s", text, s.prompt),
+				Content: s.prompt,
+			},
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: text,
 			},
 		},
-		MaxTokens:   256,
-		Temperature: 0.7,
+		MaxTokens:   1024,
+		Temperature: 1,
 		TopP:        1,
 	}
 
