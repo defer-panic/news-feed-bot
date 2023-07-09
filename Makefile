@@ -21,7 +21,7 @@ GOLANGCI_LINT_VERSION = v1.52.0
 .PHONY: .install-linter
 .install-linter:
 	### INSTALL GOLANGCI-LINT ###
-	[ -f $(GOLANCI_LINT) ] || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(PROJECT_BIN) $(GOLANCI_LINT_VERSION)
+	[ -f $(GOLANGCI_LINT) ] || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(PROJECT_BIN) $(GOLANCI_LINT_VERSION)
 
 .PHONY: lint
 lint: .install-linter

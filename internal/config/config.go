@@ -18,6 +18,7 @@ type Config struct {
 	FilterKeywords       []string      `hcl:"filter_keywords" env:"FILTER_KEYWORDS"`
 	OpenAIKey            string        `hcl:"openai_key" env:"OPENAI_KEY"`
 	OpenAIPrompt         string        `hcl:"openai_prompt" env:"OPENAI_PROMPT"`
+	OpenAIModel          string        `hcl:"openai_model" env:"OPENAI_MODEL" default:"gpt-3.5-turbo"`
 }
 
 var (

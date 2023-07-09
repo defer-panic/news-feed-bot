@@ -46,9 +46,14 @@ func main() {
 			config.Get().FetchInterval,
 			config.Get().FilterKeywords,
 		)
+		summarizer = summary.NewOpenAISummarizer(
+			config.Get().OpenAIKey,
+			config.Get().OpenAIModel,
+			config.Get().OpenAIPrompt,
+		)
 		notifier = notifier.New(
 			articleStorage,
-			summary.NewOpenAISummarizer(config.Get().OpenAIKey, config.Get().OpenAIPrompt),
+			summarizer,
 			botAPI,
 			config.Get().NotificationInterval,
 			2*config.Get().FetchInterval,
