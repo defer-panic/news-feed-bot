@@ -68,6 +68,10 @@ func (s *OpenAISummarizer) Summarize(text string) (string, error) {
 		return "", err
 	}
 
+	if len(resp.Choices) == 0 {
+		return "", fmt.Errorf("no choices in openai response")
+	}
+
 	rawSummary := strings.TrimSpace(resp.Choices[0].Message.Content)
 	if strings.HasSuffix(rawSummary, ".") {
 		return rawSummary, nil
