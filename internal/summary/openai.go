@@ -2,6 +2,7 @@ package summary
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -69,7 +70,7 @@ func (s *OpenAISummarizer) Summarize(text string) (string, error) {
 	}
 
 	if len(resp.Choices) == 0 {
-		return "", fmt.Errorf("no choices in openai response")
+		return "", errors.New("no choices in openai response")
 	}
 
 	rawSummary := strings.TrimSpace(resp.Choices[0].Message.Content)
